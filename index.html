@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <style>
+      .container {
+        padding: 20px;
+      }
+      .filter-list {
+        margin: 10px 0;
+      }
+      .filter-item {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Twitch Stream Filter</h1>
+
+      <div>
+        <input type="text" id="filterInput" placeholder="Enter stream name to filter">
+        <button id="addFilter">Add Filter</button>
+      </div>
+
+      <div class="filter-list" id="filterList">
+        <!-- Filtered streams will be listed here -->
+      </div>
+    </div>
+
+    <script src="scripts/popup.js"></script>
+  </body>
+</html>

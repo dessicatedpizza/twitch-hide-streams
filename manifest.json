@@ -1,0 +1,20 @@
+{
+  "name": "Twitch Stream Hider",
+  "description": "Hides Twitch streams so you don't have to see them.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.twitch.tv/*"
+      ],
+      "js": ["scripts/hide.js"]
+    }
+  ],
+  "permissions": [
+    "storage"
+  ]
+}
