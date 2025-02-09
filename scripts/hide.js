@@ -4,99 +4,66 @@ console.log("Twitch Stream Hider: Hiding streams...");
 chrome.storage.sync.get(['twitchStreamFilters'], (result) => {
   const filters = result.twitchStreamFilters || [];
 
+  // Helper function to check and hide elements based on filters
+  const hideFilteredElements = (elements, getParent = false) => {
+    for (const element of elements) {
+      const streamText = element.textContent.toLowerCase();
+
+      if (filters.some(filter => {
+        const matches = streamText.includes(filter);
+        if (matches) {
+          console.log("Twitch Stream Hider: Hiding stream due to filter:", filter);
+        }
+        return matches;
+      })) {
+        const targetElement = getParent ? element.parentElement : element;
+        targetElement.style.display = 'none';
+      }
+    }
+  };
+
+  // Create a single observer function that handles different page types
+  const createObserver = (selector, options = {}) => {
+    return new MutationObserver((mutations, obs) => {
+      if (options.container) {
+        const container = document.querySelector(options.container);
+        if (container) {
+          obs.disconnect();
+          hideFilteredElements(container.querySelectorAll(selector));
+        }
+        return;
+      }
+
+      const elements = document.querySelectorAll(selector);
+      hideFilteredElements(elements, options.useParent);
+    });
+  };
+
   // Get the current pathname
   const pathname = window.location.pathname;
 
+  let observer;
+
   switch (pathname) {
     case "/directory/following":
-      const observer = new MutationObserver((mutations, obs) => {
-        // Get all stream elements and side nav cards with a single selector
-        const streamElements = document.querySelectorAll(`.live-channel-card, .side-nav-card`);
-        const shelfElements = document.querySelectorAll(`div[class*="shelf-card"]`);
-
-        const allElements = [...streamElements, ...shelfElements];
-
-        for (const element of allElements) {
-          const streamText = element.textContent.toLowerCase();
-
-          // Check if the stream contains any of the filtered strings
-          if (filters.some(filter => {
-            const matches = streamText.includes(filter);
-            if (matches) {
-              console.log("Twitch Stream Hider: Hiding stream due to filter:", filter);
-            }
-            return matches;
-          })) {
-            // If it's a shelf element, hide its parent instead
-            if (element.matches('div[class*="shelf-card"]')) {
-              element.parentElement.style.display = 'none';
-            } else {
-              element.style.display = 'none';
-            }
-          }
-        }
-      });
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
+      observer = createObserver('.live-channel-card, .side-nav-card, div[class*="shelf-card"]', { useParent: true });
+      break;
     default:
-
       if (pathname.includes("/directory/category/")) {
-        // Create an observer instance
-        const observer = new MutationObserver((mutations, obs) => {
-          const directoryContainer = document.querySelector('div[data-target="directory-container"]');
-          if (directoryContainer) {
-            obs.disconnect(); // Stop observing once we find the container
-
-            // Process the streams
-            for (const element of directoryContainer.querySelectorAll(`div[style*="order"]`)) {
-              const streamText = element.textContent.toLowerCase();
-              if (filters.some(filter => {
-                const matches = streamText.includes(filter);
-                if (matches) {
-                  console.log("Twitch Stream Hider: Hiding stream due to filter:", filter);
-                }
-                return matches;
-              })) {
-                element.style.display = 'none';
-              }
-            }
-          }
-        });
-
-        // Start observing the document with the configured parameters
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
+        observer = createObserver('div[style*="order"]', {
+          container: 'div[data-target="directory-container"]'
         });
       } else {
-        const observer = new MutationObserver((mutations, obs) => {
-          // Get all stream elements and side nav cards with a single selector
-          const streamElements = document.getElementsByClassName(`side-nav-card`);
-
-          for (const element of streamElements) {
-            const streamText = element.textContent.toLowerCase();
-
-            // Check if the stream contains any of the filtered strings
-            if (filters.some(filter => {
-              const matches = streamText.includes(filter);
-              if (matches) {
-                console.log("Twitch Stream Hider: Hiding stream due to filter:", filter);
-              }
-              return matches;
-            })) {
-              element.style.display = 'none';
-            }
-          }
-        });
-
-        observer.observe(document.body, {
-          childList: true,
-          substree: true
-        });
+        observer = createObserver('.side-nav-card');
       }
       break;
+  }
+
+  // Start observing
+  if (observer) {
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   }
 });

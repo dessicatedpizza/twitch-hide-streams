@@ -34,6 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateFilterList(filters) {
     filterList.innerHTML = '';
+
+    // Add header
+    const header = document.createElement('h3');
+    header.id = 'filteredStreamsHeader';
+    header.textContent = 'Filtered Streams';
+    filterList.appendChild(header);
+
     filters.forEach(filter => {
       const filterElement = document.createElement('div');
       filterElement.className = 'filter-item';
@@ -42,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
       filterText.textContent = filter;
 
       const removeButton = document.createElement('button');
+      removeButton.id = 'removeFilterButton';
       removeButton.textContent = 'Remove';
       removeButton.addEventListener('click', () => removeFilter(filter));
 

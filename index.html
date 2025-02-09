@@ -1,31 +1,60 @@
 <html>
   <head>
     <style>
+      body {
+        width: 300px;
+        height: auto;
+      }
       .container {
-        padding: 20px;
+        width: 90%;
+        margin-top: 10%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10%;
+      }
+      div#filterInputContainer {
+        margin-bottom: 20px;
+        height: 20px;
+        display: flex;
+        gap: 8px;
+      }
+      input#filterInput {
+        flex: 1;
+      }
+      button#addFilter {
+        margin-top: 0;
+      }
+      h3#filteredStreamsHeader {
+        margin-bottom: 4px;
       }
       .filter-list {
         margin: 10px 0;
       }
+      button#removeFilterButton {
+        float: right;
+      }
       .filter-item {
-        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+      }
+      .filter-item span {
+        margin-right: 8px;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Twitch Stream Filter</h1>
-
-      <div>
+      <div id="filterInputContainer">
         <input type="text" id="filterInput" placeholder="Enter stream name to filter">
         <button id="addFilter">Add Filter</button>
       </div>
-
       <div class="filter-list" id="filterList">
         <!-- Filtered streams will be listed here -->
       </div>
     </div>
-
     <script src="scripts/popup.js"></script>
   </body>
 </html>
